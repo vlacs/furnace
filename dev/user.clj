@@ -12,7 +12,9 @@
    [clojure.test :as test]
    [clojure.tools.namespace.repl :refer (refresh refresh-all)]
    [furnace]
-   [ring.adapter.jetty :refer [run-jetty]]))
+   [ring.adapter.jetty :refer [run-jetty]]
+   [net.cgrand.reload]
+    ))
 
 (def system
   "A Var containing an object representing the application under

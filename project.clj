@@ -6,7 +6,7 @@
   :dependencies [[enlive "1.1.5"]
                  [ring "1.2.2"]
                  [org.clojure/clojure "1.5.1"]
-                 [org.vlacs/helmsman "0.1.8"]]
+                 [org.vlacs/helmsman "0.1.9"]]
   :pedantic? :warn
   :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.4"]]
                    :source-paths ["dev"]}})

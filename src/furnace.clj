@@ -4,7 +4,7 @@
             [helmsman.navigation :as h-nav]
             [net.cgrand.enlive-html :as html]))
 
-(html/deftemplate core-page "templates/example.html"
+(html/deftemplate example-page "templates/example.html"
   [bootstrap-css-url
    bootstrap-css-theme-url
    bootstrap-js-url]
@@ -13,27 +13,45 @@
   [[:link (html/attr-has :href "bootstrap-theme.css")]] (html/set-attr :href bootstrap-css-theme-url)
   [[:script (html/attr-has :src "bootstrap.js")]] (html/set-attr :src bootstrap-js-url))
 
-(defn load-core-page
+(html/deftemplate front-page "templates/main.html"
+  [bootstrap-css-url
+   bootstrap-css-theme-url
+   bootstrap-js-url]
+
+  [[:link (html/attr-has :href "bootstrap.css")]] (html/set-attr :href bootstrap-css-url)
+  [[:link (html/attr-has :href "bootstrap-theme.css")]] (html/set-attr :href bootstrap-css-theme-url)
+  [[:script (html/attr-has :src "bootstrap.js")]] (html/set-attr :src bootstrap-js-url) 
+  )
+
+(defn bootstrap-uri
+  [request id]
+  (let [bootstrap (h-nav/meta-from-request request (h-nav/pred-by-id :bootstrap))]
+    (h-uri/relative-uri-str
+      request
+      (conj (get bootstrap :uri-path)
+            (get bootstrap id)))))
+
+(defn load-example-page
   [request]
-  (let [path-here (get-in request [:helmsman :uri-path])
-        bootstrap (h-nav/meta-from-request request (h-nav/pred-by-id :bootstrap))]
-    (core-page
-      (h-uri/assemble
-        (h-uri/relative-uri
-          path-here
-          (conj (:uri-path bootstrap) (:css bootstrap))))
-      (h-uri/assemble
-        (h-uri/relative-uri
-          path-here
-          (conj (:uri-path bootstrap) (:css-theme bootstrap))))
-      (h-uri/assemble
-        (h-uri/relative-uri
-          path-here
-          (conj (:uri-path bootstrap) (:js bootstrap)))))))
+  (example-page
+    (bootstrap-uri request :css)
+    (bootstrap-uri request :css-theme)
+    (bootstrap-uri request :js)))
+
+(defn load-front-page
+  [request]
+  (front-page
+    (bootstrap-uri request :css)
+    (bootstrap-uri request :css-theme)
+    (bootstrap-uri request :js)))
 
 (defn front-page-handler
   [request]
-  (load-core-page request))
+  (load-front-page request))
+
+(defn example-page-handler
+  [request]
+  (load-example-page request))
 
 (def helmsman-website
   [^{:id :bootstrap
@@ -41,6 +59,6 @@
      :css-theme ["css" "bootstrap-theme.css"]
      :js ["js" "bootstrap.js"]}
    [:resources "bootstrap" {:root "bootstrap"}]
-   [:get "/" front-page-handler
-    [:get "/nested" front-page-handler
-     [:get "/inside" front-page-handler]]]])
+   [:get "/" front-page-handler]
+   [:get "/example" example-page-handler]])
+
